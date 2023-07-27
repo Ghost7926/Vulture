@@ -19,6 +19,7 @@ def fetch_company_domain(company_name):
 
     domain = hunter_data['data']['domain']
 
+    '''
     # Write the content to a file inside the folder
     hunter_file = "hunter.txt"
     output_file_path = os.path.join(directory, hunter_file)
@@ -26,6 +27,7 @@ def fetch_company_domain(company_name):
         file.write(hunter_data)
 
     print(f"File '{hunter_file}' has been written to '{directory}'.")
+    '''
 
     return domain
 
