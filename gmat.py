@@ -46,6 +46,27 @@ def dehashed_information(target_arg):
     return dehashed_json
 
 
+#Removes empty JSON values
+def remove_empty_json_values(json_data):
+    response_dict = json.loads(json_data)
+    entries = response_dict.get("entries", [])
+    cleaned_entries = []
+    
+    for item in entries:
+        cleaned_item = {key: value for key, value in item.items() if value is not None and value != ""}
+        cleaned_entries.append(cleaned_item)
+
+    response_dict["entries"] = cleaned_entries
+    return json.dumps(response_dict)
+
+
+# reformat to json, better viewing
+def reformat_json(json_data):
+    data_dict = json.loads(json_data)
+    formatted_results = json.dumps(data_dict, indent=4)
+    return formatted_results
+
+
 # For debugging purposes
 #print(target)
 
@@ -67,11 +88,11 @@ if results:
     # For debugging purposes
     print(results)
 
-    # reformat to json, better viewing
-    data_dict = json.loads(results)
-    formatted_results = json.dumps(data_dict, indent=4)
+    formatted_results = reformat_json(results) #This was abstracting into its own method since it will be used several times
 
-    print(formatted_results)
+    print(remove_empty_json_values(formatted_results))
+
+
 
     # File stuff for later
     '''
