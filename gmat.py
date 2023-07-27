@@ -163,8 +163,7 @@ if __name__ == '__main__':
 
 '''
 put the results to a file - semi complete
-clean up the initil print - hunter is not jsonifying
-fix the click shtuff - complete
-create forcing the domain, add the domain hunter.io api as well
+clean up the initil print - hunter is not jsonifying but eh
+create domain, will still go through hunter.io, then go through dehashed
 '''
 
