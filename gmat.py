@@ -11,7 +11,7 @@ import sys
 
 # Hunter.io API
 def fetch_company_domain(company_name):
-    api_url = f"https://api.hunter.io/v2/domain-search?company={company_name}&api_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    api_url = f"https://api.hunter.io/v2/domain-search?company={company_name}&api_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     hunter_results = requests.get(api_url)
     hunter_data = hunter_results.json()
     
@@ -20,6 +20,7 @@ def fetch_company_domain(company_name):
 
     domain = hunter_data['data']['domain']
 
+    # File Stuff for later 
     '''
     # Write the content to a file inside the folder
     hunter_file = "hunter.txt"
@@ -40,7 +41,7 @@ def dehashed_information(target_arg):
     dehashed_json = requests.get('https://api.dehashed.com/search',
         headers=headers,
         params=params,
-        auth=('XXXXXXXXXXXXXXXXXXx', 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')).text
+        auth=('XXXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')).text
     
     return dehashed_json
 
@@ -53,7 +54,7 @@ domain = fetch_company_domain("Grand Canyon University")
 if domain:
     print("Domain: ", domain)
 
-    # Make directory for data
+    # Make directory for data for later
     # directory = 'Target_arg'
     # os.makedirs(directory, exist_ok=True)
 
@@ -72,6 +73,7 @@ if results:
 
     print(formatted_results)
 
+    # File stuff for later
     '''
     dehashed_file = "dehashed.txt"
 
@@ -84,8 +86,6 @@ if results:
 
 else:
     print("No information found for the domain on dehashed.com.")
-
-
 
 
 
