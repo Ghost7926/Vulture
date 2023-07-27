@@ -24,10 +24,10 @@ def main(target, domain):
         print("Try 'gmat.py --help' for help.")
         sys.exit()
     elif target:
-        print(target)
+        print("Target set: " +target)
         target_option(target)
     elif domain:
-        print(domain)
+        print("Domain set: " + domain)
         # domain_option(domain)
     else:
         print('Error: No target or domain specified.')
