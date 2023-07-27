@@ -11,7 +11,7 @@ import sys
 
 # Hunter.io API
 def fetch_company_domain(company_name):
-    api_url = f"https://api.hunter.io/v2/domain-search?company={company_name}&api_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    api_url = f"https://api.hunter.io/v2/domain-search?company={company_name}&api_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     hunter_results = requests.get(api_url)
     hunter_data = hunter_results.json()
     
@@ -41,7 +41,7 @@ def dehashed_information(target_arg):
     dehashed_json = requests.get('https://api.dehashed.com/search',
         headers=headers,
         params=params,
-        auth=('XXXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')).text
+        auth=('XXXXXXXXXXXXXXXXXXX', 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')).text
     
     return dehashed_json
 
@@ -90,7 +90,9 @@ if results:
 
     formatted_results = reformat_json(results) #This was abstracting into its own method since it will be used several times
 
-    print(remove_empty_json_values(formatted_results))
+    finished_results = remove_empty_json_values(formatted_results)
+
+    print(reformat_json(finished_results))
 
 
 
