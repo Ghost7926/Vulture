@@ -9,6 +9,7 @@ import sys
 @click.option('-T', '--target', default=None, required=True, help='Your target.')
 '''
 
+# Hunter.io API
 def fetch_company_domain(company_name):
     api_url = f"https://api.hunter.io/v2/domain-search?company={company_name}&api_key=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     hunter_results = requests.get(api_url)
@@ -31,7 +32,7 @@ def fetch_company_domain(company_name):
 
     return domain
 
-
+# Dehashed API
 def dehashed_information(target_arg):
     headers = {'Accept': 'application/json'}
     params = (('query', f'domain:{target_arg}'),)
