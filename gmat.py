@@ -49,8 +49,9 @@ def target_option(target):
         hunter_data = hunter_results.json()
         
         # For debugging purposes
-        print(hunter_data)
-    
+        #print(hunter_data)
+        print(format_json_indents(fix_json_string(hunter_data)))
+
         domain = hunter_data['data']['domain']
     
         # File Stuff for later 
@@ -97,11 +98,15 @@ def target_option(target):
     
     
     # reformat to json, better viewing
-    def reformat_json(json_data):
+    def format_json_indents(json_data):
         data_dict = json.loads(json_data)
         formatted_results = json.dumps(data_dict, indent=4)
         return formatted_results
     
+
+    # This fixes the weird json string that hunter.io responds with
+    def fix_json_string(json_data):
+        return json_data.replace("'", '"').replace("True", "true").replace("False", "false").replace("None", "null")
     
     # For debugging purposes
     #print(target)
@@ -124,11 +129,11 @@ def target_option(target):
         # For debugging purposes
         # print(results)
     
-        formatted_results = reformat_json(results) #This was abstracting into its own method since it will be used several times
+        formatted_results = format_json_indents(results) #This was abstracting into its own method since it will be used several times
     
         finished_results = remove_empty_json_values(formatted_results)
     
-        print(reformat_json(finished_results))
+        print(format_json_indents(finished_results))
     
     
     
