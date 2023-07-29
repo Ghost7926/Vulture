@@ -50,7 +50,7 @@ def target_option(target):
         
         # For debugging purposes
         #print(hunter_data)
-        print(format_json_indents(fix_json_string(hunter_data)))
+        print(format_json_indents(fix_hunter_json_string(hunter_data)))
 
         domain = hunter_data['data']['domain']
     
@@ -84,7 +84,7 @@ def target_option(target):
     
     
     #Removes empty JSON values
-    def remove_empty_json_values(json_data):
+    def remove_empty_dehashed_values(json_data):
         response_dict = json.loads(json_data)
         entries = response_dict.get("entries", [])
         cleaned_entries = []
@@ -105,11 +105,10 @@ def target_option(target):
     
 
     # This fixes the weird json string that hunter.io responds with
-    def fix_json_string(json_data):
-        return json_data.replace("'", '"').replace("True", "true").replace("False", "false").replace("None", "null")
+    def fix_hunter_json_string(json_data):
+        return json_data.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""')
     
-    # For debugging purposes
-    #print(target)
+
     
     
     domain = fetch_company_domain(target)
@@ -131,7 +130,7 @@ def target_option(target):
     
         formatted_results = format_json_indents(results) #This was abstracting into its own method since it will be used several times
     
-        finished_results = remove_empty_json_values(formatted_results)
+        finished_results = remove_empty_dehashed_values(formatted_results)
     
         print(format_json_indents(finished_results))
     
