@@ -51,7 +51,7 @@ def target_option(target):
         # For debugging purposes
         #print(hunter_data)
 
-        fixed_hunter_data = fix_hunter_json_string(hunter_data)
+        fixed_hunter_data = fix_hunter_json_string(json.dumps(hunter_data))
         print(format_json_indents(fixed_hunter_data))
 
         domain = hunter_data['data']['domain']
@@ -107,9 +107,9 @@ def target_option(target):
     
 
     # This fixes the weird json string that hunter.io responds with
-    def fix_hunter_json_string(json_data):
-        json_data_str = json.dumps(json_data)
-        return json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""')
+    def fix_hunter_json_string(json_data_str):
+        fixed_json_data_str = json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""')
+        return fixed_json_data_str
     
 
     
@@ -135,7 +135,7 @@ def target_option(target):
     
         finished_results = remove_empty_dehashed_values(formatted_results)
     
-        print(format_json_indents(finished_results))
+        #print(format_json_indents(finished_results))
     
     
     
