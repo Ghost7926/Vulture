@@ -40,7 +40,10 @@ def main(target, domain):
 def target_option(target):
     global hunter_key, dehashed_cred_key, dehashed_key
        # Use the 'target' variable in your program logic
-    
+
+
+#------------------------------- API Calls -------------------------------------#
+
     # Hunter.io API
     def fetch_company_domain(company_name):
         global hunter_key
@@ -84,7 +87,8 @@ def target_option(target):
         
         return dehashed_json
     
-    
+#------------------ String and JSON Manipulation Functions ---------------------#
+
     #Removes empty JSON values
     def remove_empty_dehashed_values(json_data):
         response_dict = json.loads(json_data)
@@ -112,15 +116,41 @@ def target_option(target):
         return fixed_json_data_str
     
 
+    #Converts Dehashed JSON data strings into a clean plaintext format.
+    #This
+    def dehash_to_plaintext(dehash_data):
+        # Extract balance
+        balance = data["balance"]
     
+        # Extract entries
+        entries = data["entries"]
     
+        # Generate plain text
+        plain_text = f"Balance: {balance}\n\nEntries:\n"
+    
+        for idx, entry in enumerate(entries, start=1):
+            plain_text += f"{idx}. ID: {entry['id']}\n"
+            plain_text += f"   Email: \"{entry['email']}\"\n" if entry['email'] else ""
+            plain_text += f"   IP Address: \"{entry['ip_address']}\"\n" if entry['ip_address'] else ""
+            plain_text += f"   Username: \"{entry['username']}\"\n" if entry['username'] else ""
+            plain_text += f"   Password: \"{entry['password']}\"\n" if entry['password'] else ""
+            plain_text += f"   Hashed Password: \"{entry['hashed_password']}\"\n" if entry['hashed_password'] else ""
+            plain_text += f"   Name: \"{entry['name']}\"\n" if entry['name'] else ""
+            plain_text += f"   VIN: \"{entry['vin']}\"\n" if entry['vin'] else ""
+            plain_text += f"   Address: \"{entry['address']}\"\n" if entry['address'] else ""
+            plain_text += f"   Phone: \"{entry['phone']}\"\n" if entry['phone'] else ""
+            plain_text += f"   Database Name: \"{entry['database_name']}\"\n" if entry['database_name'] else ""
+            plain_text += f"\n"
+    
+        return plain_text
+
+
+#-------------------------------- Data Output ----------------------------------#
+    
+
     domain = fetch_company_domain(target)
     if domain:
         print("Domain: ", domain)
-    
-        # Make directory for data for later
-        # directory = 'Target_arg'
-        # os.makedirs(directory, exist_ok=True)
     
     else:
         print("No domain found for the company domain on Hunter.io.")
@@ -136,26 +166,22 @@ def target_option(target):
         finished_results = remove_empty_dehashed_values(formatted_results)
     
         print(format_json_indents(finished_results))
+
+        #Creates file and saves results
+        with open(f"dehash.{domain}.txt", 'w') as outputfile:
+            outputfile.write(dehash_to_plaintext(results))
+            outputfile.close()
+            print(f"Saved results to dehash.{domain}.txt")
     
-    
-    
-        # File stuff for later
-        '''
-        dehashed_file = "dehashed.txt"
-    
-        # Write the content to a file inside the folder
-        output_file_path = os.path.join(directory, dehashed_file)
-        with open(output_file_path, 'w') as file:
-            file.write(formatted_results)
-        print(f"File '{file_name}' has been written to '{directory}'.")
-        '''
     
     else:
         print("No information found for the domain on dehashed.com.")
     
     return
 
-# Domain
+
+#--------------------------------- Domain Option -------------------------------#
+
 # This will skip the domain enumeration with Hunter.io and only enumerate for credentials with the domain given
 def domain_option(domain):
     # This is being worked on
@@ -275,3 +301,4 @@ put the results to a file - semi complete
 clean up the initil print - hunter is not jsonifying but eh
 create domain, will still go through hunter.io, then go through dehashed
 '''
+
