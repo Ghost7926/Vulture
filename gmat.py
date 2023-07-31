@@ -3,6 +3,7 @@ import requests
 import click
 import json
 import sys
+import os
 
 
 global hunter_key, dehashed_cred_key, dehashed_key
@@ -35,6 +36,92 @@ def main(target, domain):
         print("Try 'gmat.py --help' for help.")
         sys.exit()
 
+
+#-------------------------------- File IO --------------------------------------#
+
+#Saves files to domain directory and creates directory if needed.
+def save_file_to_directory(directory_name, file_name, content):
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    dir_path = os.path.join(current_directory, directory_name)
+
+    if not os.path.exists(dir_path):
+        try:
+            os.makedirs(dir_path)
+            print(f"Directory {directory_name} created.")
+        except OSError as e:
+            print(f"Failed to create directory {directory_name}: {e}")
+            return
+
+    file_path = os.path.join(dir_path, file_name)
+    try:
+        with open(file_path, 'w') as file:
+            file.write(dehash_to_plaintext(content))
+            file.close()
+        print(f"File '{file_name}' saved successfully.")
+    except IOError as e:
+        print(f"Failed to save the file '{file_name}': {e}")
+
+
+
+#------------------- String and JSON Manipulation Functions --------------------#
+
+#Removes empty JSON values
+def remove_empty_dehashed_values(json_data):
+    response_dict = json.loads(json_data)
+    entries = response_dict.get("entries", [])
+    cleaned_entries = []
+    
+    for item in entries:
+        cleaned_item = {key: value for key, value in item.items() if value is not None and value != ""}
+        cleaned_entries.append(cleaned_item)
+
+    response_dict["entries"] = cleaned_entries
+    return json.dumps(response_dict)
+
+# reformat to json, better viewing
+def format_json_indents(json_data):
+    data_dict = json.loads(json_data)
+    formatted_results = json.dumps(data_dict, indent=4)
+    return formatted_results
+
+# This fixes the weird json string that hunter.io responds with
+def fix_hunter_json_string(json_data_str):
+    fixed_json_data_str = json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""') #This has a bug lol
+    return fixed_json_data_str
+
+#Converts Dehashed JSON data strings into a clean plaintext format.
+def dehash_to_plaintext(dehash_data):
+    data = json.loads(dehash_data)
+
+    # Extract balance
+    balance = data["balance"]
+
+    # Extract entries
+    entries = data["entries"]
+
+    # Generate plain text
+    plain_text = f"Balance: {balance}\n\nEntries:\n"
+
+    for idx, entry in enumerate(entries, start=1):
+        plain_text += f"{idx}. ID: {entry['id']}\n"
+        plain_text += f"   Email: \"{entry['email']}\"\n" if entry['email'] else ""
+        plain_text += f"   IP Address: \"{entry['ip_address']}\"\n" if entry['ip_address'] else ""
+        plain_text += f"   Username: \"{entry['username']}\"\n" if entry['username'] else ""
+        plain_text += f"   Password: \"{entry['password']}\"\n" if entry['password'] else ""
+        plain_text += f"   Hashed Password: \"{entry['hashed_password']}\"\n" if entry['hashed_password'] else ""
+        plain_text += f"   Name: \"{entry['name']}\"\n" if entry['name'] else ""
+        plain_text += f"   VIN: \"{entry['vin']}\"\n" if entry['vin'] else ""
+        plain_text += f"   Address: \"{entry['address']}\"\n" if entry['address'] else ""
+        plain_text += f"   Phone: \"{entry['phone']}\"\n" if entry['phone'] else ""
+        plain_text += f"   Database Name: \"{entry['database_name']}\"\n" if entry['database_name'] else ""
+        plain_text += f"\n"
+
+    return plain_text
+
+
+
+#-------------------------------- Target Option -------------------------------#
+
 # Target 
 # Starts with searching for a domain of the company specified with Hunter.io then will move into enumerating for credentials
 def target_option(target):
@@ -42,7 +129,7 @@ def target_option(target):
        # Use the 'target' variable in your program logic
 
 
-#------------------------------- API Calls -------------------------------------#
+    #------------- API Calls ------------#
 
     # Hunter.io API
     def fetch_company_domain(company_name):
@@ -58,17 +145,6 @@ def target_option(target):
         print(format_json_indents(fixed_hunter_data))
 
         domain = hunter_data['data']['domain']
-    
-        # File Stuff for later 
-        '''
-        # Write the content to a file inside the folder
-        hunter_file = "hunter.txt"
-        output_file_path = os.path.join(directory, hunter_file)
-        with open(output_file_path, 'w') as file:
-            file.write(hunter_data)
-    
-        print(f"File '{hunter_file}' has been written to '{directory}'.")
-        '''
     
         return domain
     
@@ -86,68 +162,10 @@ def target_option(target):
         # print(dehashed_json)
         
         return dehashed_json
-    
-#------------------ String and JSON Manipulation Functions ---------------------#
-
-    #Removes empty JSON values
-    def remove_empty_dehashed_values(json_data):
-        response_dict = json.loads(json_data)
-        entries = response_dict.get("entries", [])
-        cleaned_entries = []
-        
-        for item in entries:
-            cleaned_item = {key: value for key, value in item.items() if value is not None and value != ""}
-            cleaned_entries.append(cleaned_item)
-    
-        response_dict["entries"] = cleaned_entries
-        return json.dumps(response_dict)
-    
-    
-    # reformat to json, better viewing
-    def format_json_indents(json_data):
-        data_dict = json.loads(json_data)
-        formatted_results = json.dumps(data_dict, indent=4)
-        return formatted_results
-    
-
-    # This fixes the weird json string that hunter.io responds with
-    def fix_hunter_json_string(json_data_str):
-        fixed_json_data_str = json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""')
-        return fixed_json_data_str
-    
-
-    #Converts Dehashed JSON data strings into a clean plaintext format.
-    #This
-    def dehash_to_plaintext(dehash_data):
-        # Extract balance
-        balance = data["balance"]
-    
-        # Extract entries
-        entries = data["entries"]
-    
-        # Generate plain text
-        plain_text = f"Balance: {balance}\n\nEntries:\n"
-    
-        for idx, entry in enumerate(entries, start=1):
-            plain_text += f"{idx}. ID: {entry['id']}\n"
-            plain_text += f"   Email: \"{entry['email']}\"\n" if entry['email'] else ""
-            plain_text += f"   IP Address: \"{entry['ip_address']}\"\n" if entry['ip_address'] else ""
-            plain_text += f"   Username: \"{entry['username']}\"\n" if entry['username'] else ""
-            plain_text += f"   Password: \"{entry['password']}\"\n" if entry['password'] else ""
-            plain_text += f"   Hashed Password: \"{entry['hashed_password']}\"\n" if entry['hashed_password'] else ""
-            plain_text += f"   Name: \"{entry['name']}\"\n" if entry['name'] else ""
-            plain_text += f"   VIN: \"{entry['vin']}\"\n" if entry['vin'] else ""
-            plain_text += f"   Address: \"{entry['address']}\"\n" if entry['address'] else ""
-            plain_text += f"   Phone: \"{entry['phone']}\"\n" if entry['phone'] else ""
-            plain_text += f"   Database Name: \"{entry['database_name']}\"\n" if entry['database_name'] else ""
-            plain_text += f"\n"
-    
-        return plain_text
 
 
-#-------------------------------- Data Output ----------------------------------#
+    #----------------- Data Output ------------------#
     
-
     domain = fetch_company_domain(target)
     if domain:
         print("Domain: ", domain)
@@ -162,16 +180,11 @@ def target_option(target):
         # print(results)
     
         formatted_results = format_json_indents(results) #This was abstracting into its own method since it will be used several times
-    
         finished_results = remove_empty_dehashed_values(formatted_results)
     
         print(format_json_indents(finished_results))
 
-        #Creates file and saves results
-        with open(f"dehash.{domain}.txt", 'w') as outputfile:
-            outputfile.write(dehash_to_plaintext(results))
-            outputfile.close()
-            print(f"Saved results to dehash.{domain}.txt")
+        save_file_to_directory(target, f"dehash.{domain}.txt", results)
     
     
     else:
@@ -202,17 +215,6 @@ def domain_option(domain):
 
         # This doesnt need to be printed but should be sent to a file
         # print(format_json_indents(fixed_hunter_data))
-
-        # File Stuff for later 
-        '''
-        # Write the content to a file inside the folder
-        hunter_file = "hunter.txt"
-        output_file_path = os.path.join(directory, hunter_file)
-        with open(output_file_path, 'w') as file:
-            file.write(hunter_data)
-    
-        print(f"File '{hunter_file}' has been written to '{directory}'.")
-        '''
     
         return 
     
@@ -230,31 +232,7 @@ def domain_option(domain):
         # print(dehashed_json)
         
         return dehashed_json
-    
-    #Removes empty JSON values
-    def remove_empty_dehashed_values(json_data):
-        response_dict = json.loads(json_data)
-        entries = response_dict.get("entries", [])
-        cleaned_entries = []
-        
-        for item in entries:
-            cleaned_item = {key: value for key, value in item.items() if value is not None and value != ""}
-            cleaned_entries.append(cleaned_item)
-    
-        response_dict["entries"] = cleaned_entries
-        return json.dumps(response_dict)
-    
-    # reformat to json, better viewing
-    def format_json_indents(json_data):
-        data_dict = json.loads(json_data)
-        formatted_results = json.dumps(data_dict, indent=4)
-        return formatted_results
 
-    # This fixes the weird json string that hunter.io responds with
-    def fix_hunter_json_string(json_data_str):
-        fixed_json_data_str = json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""')
-        return fixed_json_data_str
-    
 
     
     
@@ -270,19 +248,6 @@ def domain_option(domain):
         finished_results = remove_empty_dehashed_values(formatted_results)
     
         print(format_json_indents(finished_results))
-    
-    
-    
-        # File stuff for later
-        '''
-        dehashed_file = "dehashed.txt"
-    
-        # Write the content to a file inside the folder
-        output_file_path = os.path.join(directory, dehashed_file)
-        with open(output_file_path, 'w') as file:
-            file.write(formatted_results)
-        print(f"File '{file_name}' has been written to '{directory}'.")
-        '''
     
     else:
         print("No information found for the domain on dehashed.com.")
