@@ -41,25 +41,30 @@ def main(target, domain):
 
 #Saves files to domain directory and creates directory if needed.
 def save_file_to_directory(directory_name, file_name, content):
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    dir_path = os.path.join(current_directory, directory_name)
-
-    if not os.path.exists(dir_path):
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        dir_path = os.path.join(current_directory, directory_name)
+    
+        if not os.path.exists(dir_path):
+            try:
+                os.makedirs(dir_path)
+                print(f"Directory {directory_name} created.")
+            except OSError as e:
+                print(f"Failed to create directory {directory_name}: {e}")
+                return
+    
+        file_path = os.path.join(dir_path, file_name)
         try:
-            os.makedirs(dir_path)
-            print(f"Directory {directory_name} created.")
-        except OSError as e:
-            print(f"Failed to create directory {directory_name}: {e}")
-            return
-
-    file_path = os.path.join(dir_path, file_name)
-    try:
-        with open(file_path, 'w') as file:
-            file.write(dehash_to_plaintext(content))
-            file.close()
-        print(f"File '{file_name}' saved successfully.")
-    except IOError as e:
-        print(f"Failed to save the file '{file_name}': {e}")
+            with open(file_path, 'w') as file:
+                if "dehash" in file_name:
+                    file.write(dehash_to_plaintext(content))
+                elif "hunter" in file_name:
+                    file.write(hunter_to_plaintext(content))
+                else:
+                    print(f"Filename {file_name} incorrect format.")
+                file.close()
+            print(f"File '{file_name}' saved successfully.")
+        except IOError as e:
+            print(f"Failed to save the file '{file_name}': {e}")
 
 
 
@@ -115,8 +120,52 @@ def dehash_to_plaintext(dehash_data):
         plain_text += f"   Phone: \"{entry['phone']}\"\n" if entry['phone'] else ""
         plain_text += f"   Database Name: \"{entry['database_name']}\"\n" if entry['database_name'] else ""
         plain_text += f"\n"
-
     return plain_text
+
+#Convert Hunter JSON data strings into a clean plaintext format
+def hunter_to_plaintext(json_data):
+    data = json.loads(json_data)
+
+    formatted_text = f"""
+Company Information:
+---------------------
+Domain: {data['data']['domain']}
+Disposable: {data['data']['disposable']}
+Webmail: {data['data']['webmail']}
+Accept All Emails: {data['data']['accept_all']}
+Pattern: {data['data']['pattern']}
+Organization: {data['data']['organization']}
+Description: {data['data']['description']}
+Twitter: {data['data']['twitter']}
+Facebook: {data['data']['facebook']}
+LinkedIn: {data['data']['linkedin']}
+Instagram: {data['data']['instagram']}
+YouTube: {data['data']['youtube']}
+
+Technologies Used:
+-------------------
+"""
+    formatted_text += "- " + "\n- ".join(data['data']['technologies'])
+    formatted_text += f"""
+
+Location:
+----------
+Country: {data['data']['country']}
+State: {data['data']['state']}
+City: {data['data']['city']}
+Postal Code: {data['data']['postal_code']}
+Street: {data['data']['street']}
+
+Email Contacts:
+----------------
+"""
+    for idx, email in enumerate(data['data']['emails'], 1):
+        sources = "\n     - ".join([f"{source['domain']} (Extracted on {source['extracted_on']}, Still on Page)" for source in email["sources"]])
+        formatted_text += f"{idx}. {email['first_name']} {email['last_name']}\n"
+        formatted_text += f"   - Email: {email['value']}\n"
+        formatted_text += f"   - Confidence: {email['confidence']}%\n"
+        formatted_text += f"   - Sources:\n     - {sources}\n\n"
+    return formatted_text
 
 
 
