@@ -21,8 +21,8 @@ dehashed_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed API Key
 def main(target, domain):
     if (target and domain):
         print('Error: Target and Domain are exclusive.')
-        print('Usage: gmat.py [OPTIONS]')
-        print("Try 'gmat.py --help' for help.")
+        print('Usage: vulture.py [OPTIONS]')
+        print("Try 'vulture.py --help' for help.")
         sys.exit()
     elif target:
         print("Target set: " +target)
