@@ -1,5 +1,5 @@
 # Vulture
-Created by Ryan 'Ghost' Voit and Mark ["Dread"](https://github.com/Markofka007) Perekopsky
+Created by Ryan '[Ghost](https://github.com/Ghost7926)' Voit and Mark '[Dread](https://github.com/Markofka007)' Perekopsky
 
 This program is built to help automate the task of locating breached credentials on the internet. 
 This script currently is built to use Hunter.io and Dehashed APIs to collect infoamtion on a pecified domain or target name. 
