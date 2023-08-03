@@ -1,8 +1,8 @@
 # Give Me A Target, aka GMAT
 Created by Ryan 'Ghost' Voit and Mark 'Dread' Perekopsky
 
-This program is built to help automate some tasks when conducting OSINT on a client. 
-This script currently is built to find breached credentials from either an organization name or domain name using Hunter.io and dehashed APIs to collect infoamtion. 
-In the future, this script will grow larger to help automate more tasks related to OSINT. 
+This program is built to help automate the task of locating breached credentials on the internet. 
+This script currently is built to use Hunter.io and Dehashed APIs to collect infoamtion on a pecified domain or target name. 
+In the future, we intend to find and use more APIs to help find and locate more breached credentials. 
 
 This is a work in progress.
