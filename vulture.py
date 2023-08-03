@@ -18,6 +18,7 @@ dehashed_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed API Key
 @click.option('-T', '--target', default=None, help='Specify your target to enumerate domain and credentials.')
 @click.option('-D', '--domain', default=None, help='Specify the domain to enumerate credentials.')
 
+
 def main(target, domain):
     if (target and domain):
         print('Error: Target and Domain are exclusive.')
@@ -25,11 +26,11 @@ def main(target, domain):
         print("Try 'vulture.py --help' for help.")
         sys.exit()
     elif target:
-        print("Target set: " +target)
-        target_option(target)
+        print("Target set: " + target)
+        target_dehash(target)
     elif domain:
         print("Domain set: " + domain)
-        domain_option(domain)
+        domain_dehash(domain)
     else:
         print('Error: No target or domain specified.')
         print('Usage: gmat.py [OPTIONS]')
@@ -173,7 +174,7 @@ Email Contacts:
 
 # Target 
 # Starts with searching for a domain of the company specified with Hunter.io then will move into enumerating for credentials
-def target_option(target):
+def target_dehash(target):
     global hunter_key, dehashed_cred_key, dehashed_key
        # Use the 'target' variable in your program logic
 
@@ -188,12 +189,14 @@ def target_option(target):
         hunter_data = hunter_results.json()
         
         # For debugging purposes
-        #print(hunter_data)
+        # print(hunter_data)
 
         fixed_hunter_data = fix_hunter_json_string(json.dumps(hunter_data))
-        print(format_json_indents(fixed_hunter_data))
+        # print(format_json_indents(fixed_hunter_data))
 
         domain = hunter_data['data']['domain']
+
+        save_file_to_directory(company_name, f"hunter.{domain}.txt", fixed_hunter_data)
     
         return domain
     
@@ -245,7 +248,7 @@ def target_option(target):
 #--------------------------------- Domain Option -------------------------------#
 
 # This will skip the domain enumeration with Hunter.io and only enumerate for credentials with the domain given
-def domain_option(domain):
+def domain_dehash(domain):
     # This is being worked on
     global hunter_key, dehashed_cred_key, dehashed_key
        # Use the 'target' variable in your program logic
@@ -264,6 +267,8 @@ def domain_option(domain):
 
         # This doesnt need to be printed but should be sent to a file
         # print(format_json_indents(fixed_hunter_data))
+
+        save_file_to_directory(domain, f"hunter.{company_domain}.txt", fixed_hunter_data)
     
         return 
     
@@ -282,9 +287,6 @@ def domain_option(domain):
         
         return dehashed_json
 
-
-    
-    
     domain_information(domain)
     
     results = dehashed_information(domain)
@@ -297,6 +299,8 @@ def domain_option(domain):
         finished_results = remove_empty_dehashed_values(formatted_results)
     
         print(format_json_indents(finished_results))
+
+        save_file_to_directory(domain, f"dehash.{domain}.txt", results)
     
     else:
         print("No information found for the domain on dehashed.com.")
@@ -307,12 +311,4 @@ def domain_option(domain):
 
 if __name__ == '__main__':
     main()
-
-
-
-'''
-put the results to a file - semi complete
-clean up the initil print - hunter is not jsonifying but eh
-create domain, will still go through hunter.io, then go through dehashed
-'''
 
