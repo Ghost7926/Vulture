@@ -6,6 +6,8 @@ This script currently is built to use Hunter.io and Dehashed APIs to collect inf
 In the future, we intend to find and use more APIs to help find and locate more breached credentials. 
 
 This is a work in progress.
+
 Known Error:
+
 Hunter.io rogue '
 If there is an ' in a key pair value will breack the JSON formatting, it will break the program. This sometimes occures in the Hunter.io API results, often in the discription of the company. We are working to fix this issue. 
