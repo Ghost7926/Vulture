@@ -9,15 +9,16 @@ import os
 global hunter_key, dehashed_cred_key, dehashed_key
 
 # Place Keys here
-hunter_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Hunter.io API Key
-dehashed_cred_key = 'XXXXXXXXXXXXXXXXXXXXXX' # Dehashed email
+hunter_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Hunter.io API Key
+dehashed_cred_key = 'XXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed email
 dehashed_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed API Key
 
 
 @click.command()
 @click.option('-T', '--target', default=None, help='Specify your target to enumerate domain and credentials.')
 @click.option('-D', '--domain', default=None, help='Specify the domain to enumerate credentials.')
-
+# @click.option('--dehashed', default=None, help='Specify dehased API to enumerate for breached credentials.')
+# @click.option('--pwned', default=None, help='Specify have i been pwned API to enumerate for breached accounts.')
 
 def main(target, domain):
     if (target and domain):
@@ -36,6 +37,46 @@ def main(target, domain):
         print('Usage: gmat.py [OPTIONS]')
         print("Try 'gmat.py --help' for help.")
         sys.exit()
+
+''' later additions
+def main(target, domain, dehashed, pwned)
+    if (dehashed and pwned):
+        print('Error: Dehased and Pwned are excluse to eachother')
+        print('Usage: vulture.py [OPTIONS]')
+        print("Try 'vulture.py --help' for help.")
+        sys.exit()
+    elif (target and domain):
+        print('Error: Target and Domain are exclusive to eachother.')
+        print('Usage: vulture.py [OPTIONS]')
+        print("Try 'vulture.py --help' for help.")
+        sys.exit()
+    elif (target and dehashed):
+        print("Running dehashed against Target...")
+        print("Target set: " + target)
+        target_dehashed(target)
+    elif (target and pwned):
+        print("Running have i been pwned against Target...")
+        print("Target set: " + target)
+        target_pwned(target)
+    elif (domain and dehashed):
+        print("Running deahsed against Domain...")
+        print("Domain set: " + domain)
+        domain_dehashed(domain)
+    elif (domain and pwned):
+        print("Running have i been pwned against Domain...")
+        print("Domain set: " + domain)
+        domain_pwned(domain)
+    elif (target == None and domain == None):
+        print('Error: Either domain or target should be set so there is something to search.')
+        print('Usage: vulture.py [OPTIONS]')
+        print("Try 'vulture.py --help' for help.")
+        sys.exit()
+    elif (dehashed == None and pwned == None):
+        print('Error: Either dehashed or pwned should be set so you can search with one.')
+        print('Usage: vulture.py [OPTIONS]')
+        print("Try 'vulture.py --help' for help.")
+        sys.exit()
+'''
 
 
 #-------------------------------- File IO --------------------------------------#
