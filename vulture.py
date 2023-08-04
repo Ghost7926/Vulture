@@ -9,8 +9,8 @@ import os
 global hunter_key, dehashed_cred_key, dehashed_key
 
 # Place Keys here
-hunter_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Hunter.io API Key
-dehashed_cred_key = 'XXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed email
+hunter_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Hunter.io API Key
+dehashed_cred_key = 'XXXXXXXXXXXXXXXXXXXXXX' # Dehashed email
 dehashed_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed API Key
 
 
@@ -44,7 +44,11 @@ def main(target, domain):
 def save_file_to_directory(directory_name, file_name, content):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         dir_path = os.path.join(current_directory, directory_name)
-    
+        
+        with open(os.path.join(current_directory, "jsondebug.txt"), 'w') as raw_json:
+            raw_json.write(content)
+            raw_json.close()
+
         if not os.path.exists(dir_path):
             try:
                 os.makedirs(dir_path)
@@ -90,10 +94,29 @@ def format_json_indents(json_data):
     formatted_results = json.dumps(data_dict, indent=4)
     return formatted_results
 
-# This fixes the weird json string that hunter.io responds with
+# This fixes the weird json string that hunter.io responds with and removes and rogue double quotes that would break the JSON formatting
 def fix_hunter_json_string(json_data_str):
-    fixed_json_data_str = json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""') #This has a bug lol
-    return fixed_json_data_str
+    result = ""
+    previous_quote = False
+    second_quote = False
+
+    for char in json_data_str:
+        if char == '"' or char == "'":
+            if second_quote:
+                previous_quote = True
+            else:
+                result += char
+                second_quote = True
+        elif previous_quote and second_quote and (char == ',' or char == '}' or char == ":" or char == "]"):
+            result += '"'
+            result += char
+            previous_quote = False
+            second_quote = False
+        else:
+            result += char
+            previous_quote = False
+    #fixed_json_data_str = json_data_str.replace("'", '"').replace(": True", ': "true"').replace(": False", ': "false"').replace(": None", ': ""') #This has a bug lol
+    return result
 
 #Converts Dehashed JSON data strings into a clean plaintext format.
 def dehash_to_plaintext(dehash_data):
@@ -311,4 +334,3 @@ def domain_dehash(domain):
 
 if __name__ == '__main__':
     main()
-
