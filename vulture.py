@@ -19,8 +19,9 @@ dehashed_key = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' # Dehashed API Key
 @click.option('-D', '--domain', default=None, help='Specify the domain to enumerate credentials.')
 # @click.option('--dehashed', default=None, help='Specify dehased API to enumerate for breached credentials.')
 # @click.option('--pwned', default=None, help='Specify have i been pwned API to enumerate for breached accounts.')
+@click.option('--raw/--no-raw', default=False, help="Print the raw JSON information from the API's.")
 
-def main(target, domain):
+def main(target, domain, raw):
     if (target and domain):
         print('Error: Target and Domain are exclusive.')
         print('Usage: vulture.py [OPTIONS]')
@@ -28,10 +29,10 @@ def main(target, domain):
         sys.exit()
     elif target:
         print("Target set: " + target)
-        target_dehash(target)
+        target_dehash(target, raw)
     elif domain:
         print("Domain set: " + domain)
-        domain_dehash(domain)
+        domain_dehash(domain, raw)
     else:
         print('Error: No target or domain specified.')
         print('Usage: gmat.py [OPTIONS]')
@@ -85,10 +86,6 @@ def main(target, domain, dehashed, pwned)
 def save_file_to_directory(directory_name, file_name, content):
         current_directory = os.path.dirname(os.path.abspath(__file__))
         dir_path = os.path.join(current_directory, directory_name)
-        
-        with open(os.path.join(current_directory, "jsondebug.txt"), 'w') as raw_json:
-            raw_json.write(content)
-            raw_json.close()
 
         if not os.path.exists(dir_path):
             try:
@@ -101,7 +98,9 @@ def save_file_to_directory(directory_name, file_name, content):
         file_path = os.path.join(dir_path, file_name)
         try:
             with open(file_path, 'w') as file:
-                if "dehash" in file_name:
+                if "raw_json" in file_name:
+                    file.write(content)
+                elif "dehash" in file_name:
                     file.write(dehash_to_plaintext(content))
                 elif "hunter" in file_name:
                     file.write(hunter_to_plaintext(content))
@@ -238,7 +237,7 @@ Email Contacts:
 
 # Target 
 # Starts with searching for a domain of the company specified with Hunter.io then will move into enumerating for credentials
-def target_dehash(target):
+def target_dehash(target, raw):
     global hunter_key, dehashed_cred_key, dehashed_key
        # Use the 'target' variable in your program logic
 
@@ -253,7 +252,8 @@ def target_dehash(target):
         hunter_data = hunter_results.json()
         
         # For debugging purposes
-        # print(hunter_data)
+        # print(hunter_results) # gives reseponse code
+        # print(hunter_data) # gives json api data
 
         fixed_hunter_data = fix_hunter_json_string(json.dumps(hunter_data))
         # print(format_json_indents(fixed_hunter_data))
@@ -261,6 +261,9 @@ def target_dehash(target):
         domain = hunter_data['data']['domain']
 
         save_file_to_directory(company_name, f"hunter.{domain}.txt", fixed_hunter_data)
+
+        if raw == True:
+            save_file_to_directory(target, f"raw_json.hunter.{domain}.txt", json.dumps(hunter_data))
     
         return domain
     
@@ -276,6 +279,9 @@ def target_dehash(target):
             auth=(f'{dehashed_cred_key}', f'{dehashed_key}')).text
 
         # print(dehashed_json)
+
+        if raw == True:
+            save_file_to_directory(target, f"raw_json.dehash.{domain}.txt", dehashed_json)
         
         return dehashed_json
 
@@ -312,7 +318,7 @@ def target_dehash(target):
 #--------------------------------- Domain Option -------------------------------#
 
 # This will skip the domain enumeration with Hunter.io and only enumerate for credentials with the domain given
-def domain_dehash(domain):
+def domain_dehash(domain, raw):
     # This is being worked on
     global hunter_key, dehashed_cred_key, dehashed_key
        # Use the 'target' variable in your program logic
@@ -333,6 +339,9 @@ def domain_dehash(domain):
         # print(format_json_indents(fixed_hunter_data))
 
         save_file_to_directory(domain, f"hunter.{company_domain}.txt", fixed_hunter_data)
+
+        if raw == True:
+            save_file_to_directory(target, f"raw_json.hunter.{domain}.txt", json.dumps(hunter_data))
     
         return 
     
@@ -348,6 +357,9 @@ def domain_dehash(domain):
             auth=(f'{dehashed_cred_key}', f'{dehashed_key}')).text
 
         # print(dehashed_json)
+
+        if raw == True:
+            save_file_to_directory(target, f"raw_json.dehash.{domain}.txt", dehashed_json)
         
         return dehashed_json
 
