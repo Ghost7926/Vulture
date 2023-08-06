@@ -7,5 +7,5 @@ In the future, we intend to find and use more APIs to help find and locate more 
 
 This is a work in progress.
 
-Known Error:
+Known Errors:
 - No known errors at the moment :)
